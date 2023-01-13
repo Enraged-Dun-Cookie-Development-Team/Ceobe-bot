@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/tencent-connect/botgo"
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/dto/message"
@@ -21,6 +22,15 @@ import (
 var processor process.Processor
 
 func main() {
+	S := gin.Default()
+	S.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{"msg": "服务启动成功"})
+	})
+	err := S.Run(":8080")
+	if err != nil {
+		fmt.Println("服务器启动失败！")
+	}
+
 	botToken := token.New(token.TypeBot)
 	// 加载 appid 和 token
 	if err := botToken.LoadFromConfig(getConfigPath("config.json")); err != nil {
