@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"ceobe-bot/global"
 	"ceobe-bot/process"
 	"context"
 	"fmt"
@@ -17,8 +18,6 @@ import (
 	"github.com/tencent-connect/botgo/token"
 	"github.com/tencent-connect/botgo/websocket"
 )
-
-var processor process.Processor
 
 func InitBot() {
 	botToken := token.New(token.TypeBot)
@@ -37,7 +36,7 @@ func InitBot() {
 		log.Fatalln(err)
 	}
 
-	processor = process.Processor{Api: api}
+	global.BOT_PROCESS = &process.Processor{Api: api}
 
 	intent := websocket.RegisterHandlers(
 		// at 机器人事件，目前是在这个事件处理中有逻辑，会回消息，其他的回调处理都只把数据打印出来，不做任何处理
@@ -83,7 +82,7 @@ func ErrorNotifyHandler() event.ErrorNotifyHandler {
 func ATMessageEventHandler() event.ATMessageEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSATMessageData) error {
 		input := strings.ToLower(message.ETLInput(data.Content))
-		return processor.ProcessMessage(input, data)
+		return global.BOT_PROCESS.ProcessMessage(input, data)
 	}
 }
 
@@ -131,7 +130,7 @@ func CreateMessageHandler() event.MessageEventHandler {
 func InteractionHandler() event.InteractionEventHandler {
 	return func(event *dto.WSPayload, data *dto.WSInteractionData) error {
 		fmt.Println(data)
-		return processor.ProcessInlineSearch(data)
+		return global.BOT_PROCESS.ProcessInlineSearch(data)
 	}
 }
 

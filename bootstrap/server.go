@@ -3,6 +3,8 @@ package bootstrap
 import "ceobe-bot/initialize"
 
 func InitServer() {
-	initialize.InitBot();
-	initialize.InitGrpc();
+	go func() {
+		initialize.InitBot()
+	}()
+	initialize.InitGrpc()
 }

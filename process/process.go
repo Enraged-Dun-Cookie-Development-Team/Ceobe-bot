@@ -18,12 +18,12 @@ type Processor struct {
 }
 
 // ProcessMessage is a function to process message
-func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
+func (p *Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
 	ctx := context.Background()
 	cmd := message.ParseCommand(input)
 	toCreate := &dto.MessageToCreate{
-		MsgID: data.ID,
-		Content: "<@"+ data.Author.ID+">默认回复" + message.Emoji(307),
+		MsgID:   data.ID,
+		Content: "<@" + data.Author.ID + ">默认回复" + message.Emoji(307),
 	}
 
 	// 进入到私信逻辑
@@ -58,7 +58,7 @@ func (p Processor) ProcessMessage(input string, data *dto.WSATMessageData) error
 }
 
 // ProcessInlineSearch is a function to process inline search
-func (p Processor) ProcessInlineSearch(interaction *dto.WSInteractionData) error {
+func (p *Processor) ProcessInlineSearch(interaction *dto.WSInteractionData) error {
 	if interaction.Data.Type != dto.InteractionDataTypeChatSearch {
 		return fmt.Errorf("interaction data type not chat search")
 	}
@@ -95,7 +95,7 @@ func (p Processor) ProcessInlineSearch(interaction *dto.WSInteractionData) error
 	return nil
 }
 
-func (p Processor) dmHandler(data *dto.WSATMessageData) {
+func (p *Processor) dmHandler(data *dto.WSATMessageData) {
 	dm, err := p.Api.CreateDirectMessage(
 		context.Background(), &dto.DirectMessageToCreate{
 			SourceGuildID: data.GuildID,
