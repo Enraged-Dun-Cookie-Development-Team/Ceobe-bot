@@ -19,15 +19,18 @@ import (
 	"github.com/tencent-connect/botgo/websocket"
 )
 
-func InitBot() {
-	botToken := token.New(token.TypeBot)
-	// 加载 appid 和 token
-	if err := botToken.LoadFromConfig(getConfigPath("../config.json")); err != nil {
-		log.Fatalln(err)
-	}
-	api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
+
+type BotConfig struct {
+	AppId int64 `json:"app_id" env:"APP_ID,notEmpty"`
+	Token string `json:"token" env:"TOKEN,notEmpty"`
+	ChannelNotice string `json:"channel_notice" env:"CHANNEL_NOTICE,notEmpty"`
+}
+
+func InitBot(config BotConfig) {
+	botToken := token.BotToken(uint64(config.AppId), config.Token)
+	// api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
 	// 沙箱环境
-	// api := botgo.NewSandboxOpenAPI(botToken).WithTimeout(3 * time.Second)
+	api := botgo.NewSandboxOpenAPI(botToken).WithTimeout(3 * time.Second)
 	ctx := context.Background()
 
 	// 获取 websocket 信息

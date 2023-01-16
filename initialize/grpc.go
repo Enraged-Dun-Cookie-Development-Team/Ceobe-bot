@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"strconv"
 
 	"ceobe-bot/global"
 	"ceobe-bot/pb"
@@ -12,6 +13,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
+
+type GrpcConfig struct {
+	Port int `json:"port" env:"PORT,notEmpty"`	
+}
 
 type LogServer struct {
 	pb.UnimplementedLogServer
@@ -50,8 +55,8 @@ func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResp
 	return &pb.LogResponse{Success: true}, nil
 }
 
-func InitGrpc() {
-	l, err := net.Listen("tcp", ":8000")
+func InitGrpc(config GrpcConfig) {
+	l, err := net.Listen("tcp", ":"+strconv.Itoa(config.Port))
 	if err != nil {
 		log.Fatal("listen err")
 	}
@@ -60,7 +65,7 @@ func InitGrpc() {
 
 	reflection.Register(s)
 	pb.RegisterLogServer(s, &LogServer{})
-	log.Println("Serving gRPC on 127.0.0.1" + ":8000")
+	log.Println("Serving gRPC on 127.0.0.1:" + strconv.Itoa(config.Port))
 	err2 := s.Serve(l)
 	if err2 != nil {
 		log.Fatal("serve err")
