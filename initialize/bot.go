@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"ceobe-bot/conf"
 	"ceobe-bot/global"
 	"ceobe-bot/process"
 	"context"
@@ -19,14 +20,8 @@ import (
 	"github.com/tencent-connect/botgo/websocket"
 )
 
-type BotConfig struct {
-	AppId         int64  `json:"app_id" env:"APP_ID,notEmpty" validate:"required"`
-	Token         string `json:"token" env:"TOKEN,notEmpty" validate:"required"`
-	ChannelNotice string `json:"channel_notice" env:"CHANNEL_NOTICE,notEmpty" validate:"required"`
-}
-
-func InitBot(config BotConfig) {
-	botToken := token.BotToken(uint64(config.AppId), config.Token)
+func InitBot() {
+	botToken := token.BotToken(uint64(conf.GetConfig().Bot.AppId), conf.GetConfig().Bot.Token)
 	api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
 	// 沙箱环境
 	// api := botgo.NewSandboxOpenAPI(botToken).WithTimeout(3 * time.Second)

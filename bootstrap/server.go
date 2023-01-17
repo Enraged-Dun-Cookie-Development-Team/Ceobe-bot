@@ -4,7 +4,7 @@ import "ceobe-bot/initialize"
 
 func InitServer() {
 	go func() {
-		initialize.InitBot(config.Bot)
+		initialize.InitBot()
 	}()
-	initialize.InitGrpc(config.Grpc)
+	initialize.InitGrpc()
 }

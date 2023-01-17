@@ -1,0 +1,10 @@
+{
+    "grpc": {
+        "port": 8000
+    },
+    "bot": {
+        "app_id": 0,
+        "token": "",
+        "channel_notice": "",
+    }
+}

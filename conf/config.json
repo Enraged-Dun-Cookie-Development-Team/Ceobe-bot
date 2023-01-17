@@ -1,0 +1,10 @@
+{
+    "grpc": {
+        "port": 8000
+    },
+    "bot": {
+        "app_id": 102034729,
+        "token": "NeH3oELXnTSRKgOc5HfT4RF6bGm5IgM5",
+        "channel_notice": "99368078"
+    }
+}
