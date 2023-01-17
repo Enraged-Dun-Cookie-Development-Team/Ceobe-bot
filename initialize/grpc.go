@@ -15,7 +15,7 @@ import (
 )
 
 type GrpcConfig struct {
-	Port int `json:"port" env:"PORT,notEmpty"`	
+	Port int `json:"port" env:"PORT,notEmpty" validate:"required"`
 }
 
 type LogServer struct {
@@ -46,6 +46,7 @@ func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResp
 	}
 
 	toCreate := &dto.MessageToCreate{
+		MsgID:   "1000",
 		Content: content,
 	}
 	_, err := global.BOT_PROCESS.Api.PostMessage(ctx, "99368078", toCreate)
