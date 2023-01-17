@@ -1,57 +1,17 @@
 package initialize
 
 import (
-	"context"
 	"log"
 	"net"
 	"strconv"
 
 	"ceobe-bot/conf"
-	"ceobe-bot/global"
+	"ceobe-bot/grpc_impl"
 	"ceobe-bot/pb"
 
-	"github.com/tencent-connect/botgo/dto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
-
-type LogServer struct {
-	pb.UnimplementedLogServer
-}
-
-func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResponse, error) {
-	content := ""
-	switch in.Server {
-	case pb.LogRequest_RUST:
-		content += "服务端：rust端\n"
-	case pb.LogRequest_FETCHER:
-		content += "服务端：蹲饼器\n"
-	case pb.LogRequest_ANALYZER:
-		content += "服务端：分析器\n"
-	case pb.LogRequest_SCHEDULER:
-		content += "服务端：调度器\n"
-	}
-	content += "日志等级：" + in.Type.String() + "\n"
-	if in.Manual {
-		content += "是否人工介入：是\n"
-	} else {
-		content += "是否人工介入：否\n"
-	}
-	content += "信息：" + in.Info
-	if in.Extra != "" {
-		content += "\n---- 以下是额外内容 ----\n" + in.Extra
-	}
-
-	toCreate := &dto.MessageToCreate{
-		MsgID:   "1000",
-		Content: content,
-	}
-	_, err := global.BOT_PROCESS.Api.PostMessage(ctx, conf.GetConfig().Bot.ChannelNotice, toCreate)
-	if err != nil {
-		return &pb.LogResponse{Success: false}, nil
-	}
-	return &pb.LogResponse{Success: true}, nil
-}
 
 func InitGrpc() {
 	l, err := net.Listen("tcp", ":"+strconv.Itoa(conf.GetConfig().Grpc.Port))
@@ -62,7 +22,10 @@ func InitGrpc() {
 	s := grpc.NewServer()
 
 	reflection.Register(s)
-	pb.RegisterLogServer(s, &LogServer{})
+
+	// 注册grpc服务
+	pb.RegisterLogServer(s, grpc_impl.NewLogServer())
+
 	log.Println("Serving gRPC on 127.0.0.1:" + strconv.Itoa(conf.GetConfig().Grpc.Port))
 	err2 := s.Serve(l)
 	if err2 != nil {

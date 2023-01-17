@@ -7,8 +7,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"path"
-	"runtime"
 	"strings"
 	"time"
 
@@ -129,12 +127,4 @@ func InteractionHandler() event.InteractionEventHandler {
 		fmt.Println(data)
 		return global.BOT_PROCESS.ProcessInlineSearch(data)
 	}
-}
-
-func getConfigPath(name string) string {
-	_, filename, _, ok := runtime.Caller(1)
-	if ok {
-		return fmt.Sprintf("%s/%s", path.Dir(filename), name)
-	}
-	return ""
 }
