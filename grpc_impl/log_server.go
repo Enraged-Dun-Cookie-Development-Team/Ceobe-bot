@@ -30,7 +30,7 @@ func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResp
 	case pb.LogRequest_SCHEDULER:
 		content += "服务端：调度器\n"
 	}
-	content += "日志等级：" + in.Type.String() + "\n"
+	content += "日志等级：" + in.Level.String() + "\n"
 	if in.Manual {
 		content += "是否人工介入：是\n"
 	} else {

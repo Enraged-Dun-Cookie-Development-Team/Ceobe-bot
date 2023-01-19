@@ -22,7 +22,7 @@ func main() {
 	// 创建请求参数
 	request := pb.LogRequest{
 		Server: *pb.LogRequest_SCHEDULER.Enum(),
-		Type:   *pb.LogRequest_DEBUG.Enum(),
+		Level:   *pb.LogRequest_DEBUG.Enum(),
 		Manual: false,
 		Info:   "假装是一堆日志信息",
 		Extra:  "链接：链接要报备，假装是个链接\n多余信息：啥都行 ",
