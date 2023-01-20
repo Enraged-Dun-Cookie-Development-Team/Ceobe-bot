@@ -5,9 +5,9 @@ import (
 	"net"
 	"strconv"
 
+	"ceobe-bot/Ceobe_Proto/pb"
 	"ceobe-bot/conf"
 	"ceobe-bot/grpc_impl"
-	"ceobe-bot/pb"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

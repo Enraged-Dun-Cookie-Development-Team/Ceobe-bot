@@ -1,9 +1,9 @@
 package grpc_impl
 
 import (
+	"ceobe-bot/Ceobe_Proto/pb"
 	"ceobe-bot/conf"
 	"ceobe-bot/global"
-	"ceobe-bot/pb"
 	"context"
 
 	"github.com/tencent-connect/botgo/dto"

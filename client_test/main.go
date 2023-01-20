@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ceobe-bot/pb"
+	"ceobe-bot/Ceobe_Proto/pb"
 	"context"
 	"log"
 
