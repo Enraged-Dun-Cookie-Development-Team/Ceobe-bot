@@ -1,7 +1,7 @@
 package grpc_impl
 
 import (
-	"ceobe-bot/Ceobe_Proto/pb"
+	"ceobe-bot/Ceobe_Proto/code_gen/pb"
 	"ceobe-bot/conf"
 	"ceobe-bot/global"
 	"context"

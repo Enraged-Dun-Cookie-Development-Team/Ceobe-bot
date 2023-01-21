@@ -5,7 +5,7 @@ import (
 	"net"
 	"strconv"
 
-	"ceobe-bot/Ceobe_Proto/pb"
+	"ceobe-bot/Ceobe_Proto/code_gen/pb"
 	"ceobe-bot/conf"
 	"ceobe-bot/grpc_impl"
 
