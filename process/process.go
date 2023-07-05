@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
+	"regexp"
 	"time"
 
 	"github.com/tencent-connect/botgo/dto"
@@ -16,6 +18,18 @@ import (
 type Processor struct {
 	Api openapi.OpenAPI
 }
+
+// structure for json format
+type MaintainerInfo struct {
+	RUST      []string
+	FETCHER   []string
+	ANALYZER  []string
+	SCHEDULER []string
+}
+
+// slices of four parts' maintainers
+var RustMaintainers, FetcherMaintainers, AnalyzerMaintainers, SchedulerMaintainers []string
+var Maintaininfo = []MaintainerInfo{{RustMaintainers, FetcherMaintainers, AnalyzerMaintainers, SchedulerMaintainers}}
 
 // ProcessMessage is a function to process message
 func (p *Processor) ProcessMessage(input string, data *dto.WSATMessageData) error {
@@ -51,6 +65,32 @@ func (p *Processor) ProcessMessage(input string, data *dto.WSATMessageData) erro
 		if data.MessageReference != nil {
 			p.setEmoji(ctx, data.ChannelID, data.MessageReference.MessageID)
 		}
+	case "添加负责人":
+		switch addMaintainer(data) {
+		case 1:
+			toCreate.Content = "添加成功"
+		case 0:
+			toCreate.Content = "添加失败，已存在"
+		case -1:
+			toCreate.Content = "error"
+		default:
+		}
+		p.sendReply(ctx, data.ChannelID, toCreate)
+	case "查询负责人":
+		toCreate.Content = "该端负责人为：" + searchMaintainer(data)
+		p.sendReply(ctx, data.ChannelID, toCreate)
+	case "删除负责人":
+		switch deleteMaintainer(data) {
+		case 1:
+			toCreate.Content = "删除成功"
+		case 0:
+			toCreate.Content = "不存在指定负责人"
+		case -1:
+			toCreate.Content = "error"
+		default:
+		}
+		p.sendReply(ctx, data.ChannelID, toCreate)
+
 	default:
 	}
 
@@ -175,4 +215,135 @@ func genReplyArk(data *dto.WSATMessageData) *dto.Ark {
 			},
 		},
 	}
+}
+
+// 添加负责人语句format：@bot 添加负责人 端名 @负责人
+// eg. @小刻-测试中 添加负责人 RUST @薄生
+func addMaintainer(data *dto.WSATMessageData) int {
+	var maintainers []*(dto.User) = data.Mentions
+	var maintainpart *[]string
+	pattern := regexp.MustCompile(`添加负责人\s(\w+)\b`)
+	matches := pattern.FindStringSubmatch(data.Content)
+	part := ""
+	if len(matches) > 1 {
+		part = matches[1]
+	}
+	switch part {
+	case "RUST":
+		maintainpart = &Maintaininfo[0].RUST
+	case "FETCHER":
+		maintainpart = &Maintaininfo[0].FETCHER
+	case "ANALYZER":
+		maintainpart = &Maintaininfo[0].ANALYZER
+	case "SCHEDULER":
+		maintainpart = &Maintaininfo[0].SCHEDULER
+	default:
+
+	}
+	filePath := "./conf/maintainers.json"
+	file, err := os.Open(filePath)
+	file, err = os.OpenFile(filePath, os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return -1
+	}
+	defer file.Close()
+	for _, element := range maintainers[1:] {
+		for _, value := range *maintainpart {
+			if value == element.ID {
+				return 0
+			}
+		}
+		(*maintainpart) = append((*maintainpart), element.ID)
+	}
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(Maintaininfo)
+	if err != nil {
+		fmt.Println("Error encoding JSON:", err)
+		return -1
+	}
+	return 1
+}
+
+// 删除负责人语句format：@bot 删除负责人 端名 @负责人
+// eg. @小刻-测试中 删除负责人 RUST @薄生
+func deleteMaintainer(data *dto.WSATMessageData) int {
+	var maintainers []*(dto.User) = data.Mentions
+	var maintainpart *[]string
+	pattern := regexp.MustCompile(`删除负责人\s(\w+)\b`)
+	matches := pattern.FindStringSubmatch(data.Content)
+	part := ""
+	if len(matches) > 1 {
+		part = matches[1]
+	}
+	switch part {
+	case "RUST":
+		maintainpart = &Maintaininfo[0].RUST
+	case "FETCHER":
+		maintainpart = &Maintaininfo[0].FETCHER
+	case "ANALYZER":
+		maintainpart = &Maintaininfo[0].ANALYZER
+	case "SCHEDULER":
+		maintainpart = &Maintaininfo[0].SCHEDULER
+	default:
+
+	}
+	filePath := "./conf/maintainers.json"
+	file, err := os.Open(filePath)
+	file, err = os.OpenFile(filePath, os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return -1
+	}
+	defer file.Close()
+	j := 0
+	flag := 0
+	for _, element := range maintainers[1:] {
+		for _, value := range *maintainpart {
+			if value != element.ID {
+				(*maintainpart)[j] = value
+				j++
+
+			} else {
+				flag = 1
+			}
+		}
+	}
+	*maintainpart = (*maintainpart)[:j]
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(Maintaininfo)
+	if err != nil {
+		fmt.Println("Error encoding JSON:", err)
+		return -1
+	}
+	return flag
+}
+
+// 查询负责人语句format：@bot 查询负责人 端名 @负责人
+// eg. @小刻-测试中 查询负责人 RUST
+func searchMaintainer(data *dto.WSATMessageData) string {
+	var maintainpart *[]string
+	pattern := regexp.MustCompile(`查询负责人\s(\w+)\b`)
+	matches := pattern.FindStringSubmatch(data.Content)
+	part := ""
+	if len(matches) > 1 {
+		part = matches[1]
+	}
+	switch part {
+	case "RUST":
+		maintainpart = &Maintaininfo[0].RUST
+	case "FETCHER":
+		maintainpart = &Maintaininfo[0].FETCHER
+	case "ANALYZER":
+		maintainpart = &Maintaininfo[0].ANALYZER
+	case "SCHEDULER":
+		maintainpart = &Maintaininfo[0].SCHEDULER
+	default:
+
+	}
+	content := ""
+	for _, value := range *maintainpart {
+		content += "<@" + value + "> "
+	}
+	return content
 }

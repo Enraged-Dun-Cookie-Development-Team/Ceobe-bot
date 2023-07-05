@@ -5,8 +5,11 @@ import (
 	"ceobe-bot/global"
 	"ceobe-bot/process"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -19,6 +22,30 @@ import (
 )
 
 func InitBot() {
+
+	//初始化缓存内的维护者数组
+	filePath := "./conf/maintainers.json"
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Println("文件打开失败", err)
+
+	}
+	//及时关闭file句柄
+	defer file.Close()
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+
+	}
+	if len(data) > 0 {
+		err = json.Unmarshal(data, &process.Maintaininfo)
+		if err != nil {
+			fmt.Println("Error unmarshaling JSON:", err)
+
+		}
+	}
+	fmt.Println(string(data))
+
 	botToken := token.BotToken(uint64(conf.GetConfig().Bot.AppId), conf.GetConfig().Bot.Token)
 	api := botgo.NewOpenAPI(botToken).WithTimeout(3 * time.Second)
 	// 沙箱环境
@@ -58,6 +85,31 @@ func InitBot() {
 	if err = botgo.NewSessionManager().Start(wsInfo, botToken, &intent); err != nil {
 		log.Fatalln(err)
 	}
+
+	// //初始化缓存内的维护者数组
+	// filePath := "./conf/maintainers.json"
+	// file, err := os.Open(filePath)
+	// if err != nil {
+	// 	fmt.Println("文件打开失败", err)
+
+	// }
+	// //及时关闭file句柄
+	// defer file.Close()
+	// data, err := ioutil.ReadAll(file)
+	// if err != nil {
+	// 	fmt.Println("Error reading file:", err)
+
+	// }
+	// fmt.Println("33333333333333333333333333333")
+	// if len(data) > 0 {
+	// 	err = json.Unmarshal(data, &process.Maintaininfo[0])
+	// 	if err != nil {
+	// 		fmt.Println("Error unmarshaling JSON:", err)
+
+	// 	}
+	// }
+	// fmt.Println(data)
+
 }
 
 // ReadyHandler 自定义 ReadyHandler 感知连接成功事件
