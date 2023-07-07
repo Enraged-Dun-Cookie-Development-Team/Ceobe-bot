@@ -4,7 +4,6 @@ import (
 	"ceobe-bot/Ceobe_Proto/code_gen/pb"
 	"ceobe-bot/conf"
 	"ceobe-bot/global"
-	"ceobe-bot/process"
 	"context"
 
 	"github.com/tencent-connect/botgo/dto"
@@ -23,27 +22,15 @@ func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResp
 	content := ""
 	switch in.Server {
 	case pb.LogRequest_RUST:
-		content += "服务端：rust端\n" + "负责人："
-		for i := 0; i < len(process.Maintaininfo[0].RUST); i++ {
-			content += " <@" + process.Maintaininfo[0].RUST[i] + ">"
-		}
+		content += "服务端：rust端\n"
 	case pb.LogRequest_FETCHER:
-		content += "服务端：蹲饼器\n" + "负责人："
-		for i := 0; i < len(process.Maintaininfo[0].FETCHER); i++ {
-			content += " <@" + process.Maintaininfo[0].FETCHER[i] + ">"
-		}
+		content += "服务端：蹲饼器\n"
 	case pb.LogRequest_ANALYZER:
-		content += "服务端：分析器\n" + "负责人："
-		for i := 0; i < len(process.Maintaininfo[0].ANALYZER); i++ {
-			content += " <@" + process.Maintaininfo[0].ANALYZER[i] + ">"
-		}
+		content += "服务端：分析器\n"
 	case pb.LogRequest_SCHEDULER:
-		content += "服务端：调度器\n" + "负责人："
-		for i := 0; i < len(process.Maintaininfo[0].SCHEDULER); i++ {
-			content += " <@" + process.Maintaininfo[0].SCHEDULER[i] + ">"
-		}
+		content += "服务端：调度器\n"
 	}
-	content += "\n日志等级：" + in.Level.String() + "\n"
+	content += "日志等级：" + in.Level.String() + "\n"
 	if in.Manual {
 		content += "是否人工介入：是\n"
 	} else {
