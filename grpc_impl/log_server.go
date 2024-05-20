@@ -46,7 +46,12 @@ func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResp
 		MsgID:   "1000",
 		Content: content,
 	}
-	_, err := global.BOT_PROCESS.Api.PostMessage(ctx, conf.GetConfig().Bot.ChannelNotice, toCreate)
+	var err error
+	if (in.Level == pb.LogRequest_ERROR || in.Level == pb.LogRequest_WARN) || conf.GetConfig().Bot.ChannelInfo == "" {
+		_, err = global.BOT_PROCESS.Api.PostMessage(ctx, conf.GetConfig().Bot.ChannelNotice, toCreate)
+	} else {
+		_, err = global.BOT_PROCESS.Api.PostMessage(ctx, conf.GetConfig().Bot.ChannelInfo, toCreate)
+	}
 	if err != nil {
 		return &pb.LogResponse{Success: false}, nil
 	}

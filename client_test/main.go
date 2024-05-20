@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:8000", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:8003", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("连接 gPRC 服务失败,", err)
 	}
