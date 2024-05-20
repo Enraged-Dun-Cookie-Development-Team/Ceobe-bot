@@ -6,5 +6,6 @@
         "app_id": 0,
         "token": "",
         "channel_notice": "",
+        "channel_info": ""
     }
 }
