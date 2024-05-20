@@ -5,6 +5,7 @@ import (
 	"ceobe-bot/conf"
 	"ceobe-bot/global"
 	"context"
+	"time"
 
 	"github.com/tencent-connect/botgo/dto"
 )
@@ -20,6 +21,7 @@ func NewLogServer() *LogServer {
 // 从grpc接收日志并推送到频道中
 func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResponse, error) {
 	content := ""
+
 	switch in.Server {
 	case pb.LogRequest_RUST:
 		content += "服务端：rust端\n"
@@ -36,6 +38,10 @@ func (l *LogServer) PushLog(ctx context.Context, in *pb.LogRequest) (*pb.LogResp
 	} else {
 		content += "是否人工介入：否\n"
 	}
+	now := time.Now()
+	// 格式化为精确到秒的时间字符串
+	timeStr := now.Format("2006-01-02 15:04:05")
+	content += "当前时间：" + timeStr + "\n"
 	content += "信息：" + in.Info
 	if in.Extra != "" {
 		content += "\n---- 以下是额外内容 ----\n" + in.Extra
